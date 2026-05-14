@@ -1,0 +1,18 @@
+- baseInfo:
+    api_name: 商品列表
+    url: /coupApply/cms/goodsList
+    method: Get
+    header:
+      Content-Type: application/x-www-form-urlencoded;charset=UTF-8
+      token: ${get_extract_data(token)} #所以和token有啥区别？都能运行成功
+  testCase:
+    - case_name: 获取商品列表
+      params:
+        msgType: getHandsetListOfCust
+        page: 1
+        size: 20
+      validation:
+        - contains: { 'error_code': '0000' }
+      extract_list:
+#        token: '"token": "(.*?)"'
+        goodsId: $.goodsList[*].goodsId  #使用 JSONPath 表达式从响应中提取所有商品的 goodsId，保存到变量 goodsId 中

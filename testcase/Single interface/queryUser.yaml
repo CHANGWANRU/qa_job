@@ -1,0 +1,31 @@
+#4个测试用例
+- baseInfo:
+    api_name: 用户查询
+    url: /dar/user/queryUser
+    method: POST
+    header:
+      Content-Type: application/x-www-form-urlencoded;charset=UTF-8
+  testCase:
+    - case_name: 有效查询用户
+      data:
+        user_id: 123839387391912
+      validation:
+        - contains: { 'msg': '查询成功' }
+        - eq: { 'msg_code': 200 }
+    - case_name: 用户名参数未填
+      data:
+      validation:
+        - contains: { 'msg': '查询失败，用户id不存在!' }
+        - eq: { 'msg_code': 9001 }
+    - case_name: 用户名为空
+      data:
+        user_id: ''
+      validation:
+        - contains: { 'msg': '查询失败，用户id不存在!' }
+        - eq: { 'msg_code': 9001 }
+    - case_name: 用户名参数错误
+      data:
+        user_id: 123456
+      validation:
+        - contains: { 'msg': '查询失败，用户id不存在!' }
+        - eq: { 'msg_code': 9001 }

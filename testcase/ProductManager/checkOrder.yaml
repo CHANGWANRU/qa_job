@@ -1,0 +1,22 @@
+- baseInfo:
+    api_name: 检验商品订单状态接口
+    url: /coupApply/cms/checkOrderStatus
+    method: post
+    header:
+      Content-Type: application/json;charset=UTF-8
+  testCase:
+    - case_name: 检查订单状态已支付
+      json:
+        orderNumber: ${get_extract_data(orderNumber)}  #提交订单那个yaml里面只提交了一个订单，且用的是extract不是extract_list，所以这里用的订单就是那块那个提交的订单
+        timeStamp: ${timestamp()}
+      validation:
+        - eq: { 'error_code': '' }
+        - contains: { 'status': '0' }
+    - case_name: 订单不存在
+      json:
+        orderNumber: '7892432156'  #提交订单那个yaml里面只提交了一个订单，且用的是extract不是extract_list，所以这里用的订单就是那块那个提交的订单
+        timeStamp: ${timestamp()}
+      validation:
+        - eq: { 'error_code': '4000' }
+        - contains: { 'error': '订单编号不存在' }
+

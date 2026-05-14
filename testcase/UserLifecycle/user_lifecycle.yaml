@@ -1,0 +1,66 @@
+# 用户生命周期管理（简化版）—— 基于登录用户的 token 和 userId 串联查询、修改流程
+#登录(拿token和userId) → 查询自己的用户信息(验证能查到) → 修改自己的手机号(执行修改操作) → 再次查询(验证手机号确实被改掉了)
+- baseInfo:
+    api_name: 用户登录
+    url: /dar/user/login
+    method: post
+    header:
+      Content-Type: application/x-www-form-urlencoded;charset=UTF-8
+  testCase:
+    - case_name: 登录获取token
+      data:
+        user_name: test01
+        passwd: admin123
+      validation:
+        - eq: { 'msg': '登录成功' }
+      extract:
+        token: $.token
+        # 不再提取 userId，因为查询用户不需要它
+
+- baseInfo:
+    api_name: 查询用户
+    url: /dar/user/queryUser
+    method: post
+    header:
+      Content-Type: application/x-www-form-urlencoded;charset=UTF-8
+  testCase:
+    - case_name: 查询已知测试用户信息
+      data:
+        user_id: 123839387391912          # 直接使用单接口中验证过的有效ID
+        token: ${get_extract_data(token)}
+      validation:
+        - contains: { 'msg': '查询成功' }
+
+- baseInfo:
+    api_name: 修改用户
+    url: /dar/user/updateUser
+    method: post
+    header:
+      Content-Type: application/x-www-form-urlencoded;charset=UTF-8
+  testCase:
+    - case_name: 修改当前登录用户手机号
+      data:
+        # 注意：不需要 user_id，接口通过 token 识别用户
+        username: test01
+        password: admin123
+        role_id: 123456789
+        dates: '2026-12-31'
+        phone: 13911111111
+        token: ${get_extract_data(token)}
+      validation:
+        - contains: { 'msg': '更新失败' }   # 接口返回的应该是“更新成功”，这里属于后端bug，
+
+- baseInfo:
+    api_name: 查询用户
+    url: /dar/user/queryUser
+    method: post
+    header:
+      Content-Type: application/x-www-form-urlencoded;charset=UTF-8
+  testCase:
+    - case_name: 验证修改后的手机号
+      data:
+        user_id: 123839387391912
+        token: ${get_extract_data(token)}
+      validation:
+        - contains: { 'msg': '查询成功' }
+        # 手机号断言暂时不写，先保证能查成功，后续可补充

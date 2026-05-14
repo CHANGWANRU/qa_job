@@ -1,0 +1,50 @@
+#6个测试用例
+- baseInfo:
+    api_name: 用户登录
+    url: /dar/user/login
+    method: post
+    header:
+      Content-Type: application/x-www-form-urlencoded;charset=UTF-8
+  testCase:
+    - case_name: 用户名和密码正确登录验证
+      data: #不同情况下关键字填的东西不同哦
+        user_name: test01
+        passwd: admin123
+      validation:
+        - eq: { 'msg': '登录成功' }
+        - contains: { 'error_code': none }
+      extract:
+        token: $.token
+    - case_name: 用户名缺失
+      data:
+        passwd: admin123
+      validation:
+        - eq: {'msg': '参数错误'}
+        - eq: {'msg_code': -1}
+    - case_name: 密码缺失
+      data:
+        user_name: test01
+      validation:
+        - eq: { 'msg': '参数错误' }
+        - eq: { 'msg_code': -1 }
+    - case_name: 用户名为空
+      data:
+        user_name: ''
+        passwd: admin123
+      validation:
+        - eq: { 'msg': '参数错误' }
+        - eq: { 'msg_code': -1 }
+    - case_name: 密码为空
+      data:
+        user_name: test01
+        passwd: ''
+      validation:
+        - eq: { 'msg': '参数错误' }
+        - eq: { 'msg_code': -1 }
+    - case_name: 密码错误
+      data:
+        user_name: test01
+        passwd: admin1235
+      validation:
+        - eq: { 'msg': '登录失败,用户名或密码错误' }
+        - eq: { 'msg_code': 9001   }
